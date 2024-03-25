@@ -4,6 +4,7 @@ import film.recommendation.filmrecommendation.enums.AgeRestriction;
 import film.recommendation.filmrecommendation.enums.Genre;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -40,4 +42,11 @@ public class Movie {
     @Column(name = "genre")
     private Set<Genre> genres = new HashSet<>();
 
+    public Movie(String title, double rating, AgeRestriction ageRestriction, int releaseYear, Set<Genre> genres) {
+        this.title = title;
+        this.rating = rating;
+        this.ageRestriction = ageRestriction;
+        this.releaseYear = releaseYear;
+        this.genres = genres;
+    }
 }
