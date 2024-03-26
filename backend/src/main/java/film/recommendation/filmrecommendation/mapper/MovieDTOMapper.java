@@ -2,6 +2,7 @@ package film.recommendation.filmrecommendation.mapper;
 
 import film.recommendation.filmrecommendation.entity.Movie;
 import film.recommendation.filmrecommendation.entity.MovieDTO;
+import film.recommendation.filmrecommendation.entity.MovieDTOWithoutId;
 import film.recommendation.filmrecommendation.enums.AgeRestriction;
 import film.recommendation.filmrecommendation.enums.Genre;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ public class MovieDTOMapper {
     public MovieDTO MovieToDTO(Movie movie) {
 
         return new MovieDTO(
+                movie.getId(),
                 movie.getTitle(),
                 movie.getRating(),
                 movie.getAgeRestriction().name(),
@@ -26,11 +28,9 @@ public class MovieDTOMapper {
         );
     }
 
-    public Movie DTOToMovie(MovieDTO movieDTO) {
+    public Movie DTOWithoutIdToMovie(MovieDTOWithoutId movieDTO) {
         //Converts list of genres(as String) to Set<Genre>
-        Set<Genre> genres = movieDTO.genres().stream()
-                .map(Genre::getGenreByEstonianName)
-                .collect(Collectors.toSet());
+
 
         AgeRestriction ageRestriction = AgeRestriction
                 .getAgeRestrictionByName(String.valueOf(movieDTO.ageRestriction()));
@@ -40,8 +40,25 @@ public class MovieDTOMapper {
                 movieDTO.rating(),
                 ageRestriction,
                 movieDTO.releaseYear(),
-                genres
+                movieDTO.genres().stream()
+                        .map(Genre::getGenreByEstonianName)
+                        .collect(Collectors.toSet())
         );
     }
+
+    public Movie DTOToMovie(MovieDTO movieDTO) {
+
+        return Movie.builder()
+                .id(movieDTO.id())
+                .title(movieDTO.title())
+                .rating(movieDTO.rating())
+                .ageRestriction(AgeRestriction.valueOf(movieDTO.ageRestriction()))
+                .releaseYear(movieDTO.releaseYear())
+                .genres(movieDTO.genres().stream()
+                        .map(Genre::getGenreByEstonianName)
+                        .collect(Collectors.toSet()))
+                .build();
+    }
+
 
 }

@@ -12,4 +12,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleFilmNotFoundException(FilmNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(SessionNotFoundException.class)
+    public ResponseEntity<Object> handleSessionNotFoundException(SessionNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }

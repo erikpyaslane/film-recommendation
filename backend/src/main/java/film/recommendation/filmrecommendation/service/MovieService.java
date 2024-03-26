@@ -2,6 +2,7 @@ package film.recommendation.filmrecommendation.service;
 
 import film.recommendation.filmrecommendation.entity.Movie;
 import film.recommendation.filmrecommendation.entity.MovieDTO;
+import film.recommendation.filmrecommendation.entity.MovieDTOWithoutId;
 import film.recommendation.filmrecommendation.enums.Genre;
 import film.recommendation.filmrecommendation.exceptions.FilmNotFoundException;
 import film.recommendation.filmrecommendation.mapper.MovieDTOMapper;
@@ -49,8 +50,10 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-    public MovieDTO createMovie(MovieDTO movieDTO) {
-        return movieDTOMapper.MovieToDTO(movieRepository.save(movieDTOMapper.DTOToMovie(movieDTO)));
+    public MovieDTO createMovie(MovieDTOWithoutId movieDTO) {
+        return movieDTOMapper.MovieToDTO(
+                movieRepository.save(
+                        movieDTOMapper.DTOWithoutIdToMovie(movieDTO)));
     }
 
 

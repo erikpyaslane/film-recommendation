@@ -2,12 +2,11 @@ package film.recommendation.filmrecommendation.entity;
 
 import java.util.Set;
 
-public record MovieDTO(
-        long id,
+public record MovieDTOWithoutId(
         String title,
-        double rating,
+        Double rating,
         String ageRestriction,
-        int releaseYear,
+        Integer releaseYear,
         Set<String> genres
-)  {
+){
 }

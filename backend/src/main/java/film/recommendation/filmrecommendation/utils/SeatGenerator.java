@@ -7,12 +7,12 @@ public class SeatGenerator {
     public static boolean[][] fillSeats(int rows, int columns) {
         Random random = new Random();
         boolean[][] seats = generateSeats(rows, columns);
-        int numberOfSeatsToFill = random.nextInt(rows*columns);
+        int numberOfSeatsToFill = random.nextInt(0, rows*columns);
 
         for (int i = 0; i < numberOfSeatsToFill; i++) {
             while (true){
-                int rowNumber = random.nextInt(rows);
-                int colNumber = random.nextInt();
+                int rowNumber = random.nextInt(0,rows);
+                int colNumber = random.nextInt(0, columns);
                 if (seats[rowNumber][colNumber])
                     continue;
                 seats[rowNumber][colNumber] = true;

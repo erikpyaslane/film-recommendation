@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -27,14 +26,20 @@ public class Session {
     private long id;
 
     @OneToOne
+    @JoinColumn(name = "movie_id")
     private Movie movie;
 
+    @Column(name = "date_of_session")
     private LocalDate dateOfSession;
 
+    @Column(name = "time_of_session")
     private LocalTime timeOfSession;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "language")
     private Language language;
 
+    @Column(name = "seats")
     @Convert(converter = SeatsMatrixConverter.class)
     private boolean[][] seats;
 
