@@ -1,12 +1,11 @@
 package film.recommendation.filmrecommendation.enums;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 
 @AllArgsConstructor
 public enum Language {
-    EST ("EST"),
-    ENG ("ENG");
+    EST ("Eesti"),
+    ENG ("Inglise");
 
     private final String name;
 

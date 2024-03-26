@@ -2,7 +2,6 @@ package film.recommendation.filmrecommendation.mapper;
 
 import film.recommendation.filmrecommendation.entity.*;
 import film.recommendation.filmrecommendation.enums.Language;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

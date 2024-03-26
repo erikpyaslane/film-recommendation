@@ -7,7 +7,6 @@ import film.recommendation.filmrecommendation.enums.AgeRestriction;
 import film.recommendation.filmrecommendation.enums.Genre;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -23,7 +22,7 @@ public class MovieDTOMapper {
                 movie.getReleaseYear(),
                 movie.getGenres()
                         .stream()
-                        .map(Genre::getNameEstonian)
+                        .map(Genre::name)
                         .collect(Collectors.toSet())
         );
     }

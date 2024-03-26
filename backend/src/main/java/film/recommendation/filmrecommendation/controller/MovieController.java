@@ -1,6 +1,5 @@
 package film.recommendation.filmrecommendation.controller;
 
-import film.recommendation.filmrecommendation.entity.Movie;
 import film.recommendation.filmrecommendation.entity.MovieDTO;
 import film.recommendation.filmrecommendation.entity.MovieDTOWithoutId;
 import film.recommendation.filmrecommendation.exceptions.FilmNotFoundException;

@@ -10,12 +10,11 @@ import java.util.Optional;
 @Repository
 public interface SessionRepository extends JpaRepository<Session, Long> {
 
-
     List<Session> findAll();
     /**
     @Query("SELECT ss FROM Session ss WHERE " +
             "ss.dateOfSession <= :date AND ss.timeOfSession <= :time")
     Optional<List<Session>> findAllActualSessions(LocalDate date, LocalTime time);
-*/
+    */
     Optional<Session> findById(long id);
 }
