@@ -17,4 +17,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleSessionNotFoundException(SessionNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(NotFoundSoManySeatsException.class)
+    public ResponseEntity<Object> handleNotFoundSoManySeatsException(NotFoundSoManySeatsException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

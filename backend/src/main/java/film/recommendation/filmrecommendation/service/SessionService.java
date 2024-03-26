@@ -6,6 +6,7 @@ import film.recommendation.filmrecommendation.exceptions.SessionNotFoundExceptio
 import film.recommendation.filmrecommendation.mapper.MovieDTOMapper;
 import film.recommendation.filmrecommendation.mapper.SessionMapperDTO;
 import film.recommendation.filmrecommendation.repository.SessionRepository;
+import film.recommendation.filmrecommendation.utils.SeatRecommender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,7 @@ public class SessionService {
                 .map(sessionMapperDTO::SessionToDTO)
                 .collect(Collectors.toList());
     }
-    /**
+
     public List<SessionDTO> getAllActualSessions() throws SessionNotFoundException {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now();
@@ -53,7 +54,7 @@ public class SessionService {
                 .map(sessionMapperDTO::SessionToDTO)
                 .collect(Collectors.toList());
     }
- */
+
     public SessionDTO getChosenSession(long id) throws SessionNotFoundException {
         Optional<Session> optionalSession = sessionRepository.findById(id);
         if (optionalSession.isEmpty())
@@ -67,5 +68,11 @@ public class SessionService {
                 .DTOWithoutIdToSession(sessionDTOWithoutId, movieDTOMapper.DTOToMovie(movie));
 
         return sessionMapperDTO.SessionToDTO(sessionRepository.save(session));
+    }
+
+    public int[][] getTheBestFreeSeats(long id, int countOfSeats) throws SessionNotFoundException {
+        SessionDTO session = getChosenSession(id);
+        boolean[][] seats = session.seats();
+        return SeatRecommender.recommendFreeSeats(seats, countOfSeats);
     }
 }

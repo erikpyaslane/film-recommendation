@@ -27,12 +27,12 @@ public class SessionController {
     public ResponseEntity<List<SessionDTO>> getAllSessions() throws SessionNotFoundException {
         return new ResponseEntity<>(sessionService.getAllSessions(), HttpStatus.OK);
     }
-    /**
+
     @GetMapping
     public ResponseEntity<List<SessionDTO>> getActualSessions() throws SessionNotFoundException {
         return new ResponseEntity<>(sessionService.getAllActualSessions(), HttpStatus.OK);
     }
-*/
+
     @GetMapping("/{id}")
     public ResponseEntity<SessionDTO> getChosenSession(@PathVariable long id) throws SessionNotFoundException {
         return new ResponseEntity<>(sessionService.getChosenSession(id), HttpStatus.OK);
@@ -42,6 +42,14 @@ public class SessionController {
     public ResponseEntity<SessionDTO> createSession(@RequestBody SessionDTOWithoutId sessionDTOWithoutId)
             throws FilmNotFoundException {
         return new ResponseEntity<>(sessionService.saveSession(sessionDTOWithoutId), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}/free_seats={seatsCount}")
+    public ResponseEntity<int[][]> getFreeSeats(@PathVariable long id, @PathVariable int seatsCount)
+            throws SessionNotFoundException {
+        return new ResponseEntity<>(
+                sessionService.getTheBestFreeSeats(id, seatsCount), HttpStatus.OK
+        );
     }
 
 }
