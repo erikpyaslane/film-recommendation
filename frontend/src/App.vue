@@ -1,16 +1,12 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <SessionsPage />
+  <router-view></router-view>
 </template>
 
 <script>
-import SessionsPage from "@/pages/SessionsPage.vue";
 
 export default {
   name: 'App',
-  components: {
-    SessionsPage
-  }
 }
 </script>
 

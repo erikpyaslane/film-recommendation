@@ -19,6 +19,11 @@ ChatGPT https://chat.openai.com/c/a7a92d90-8b30-48ad-9209-ce7e288d4a57
         <p><strong>Keel:</strong> {{ session.language }}</p>
       </div>
     </div>
+    <div>
+      <router-link :to="'/session/' + session.id">
+        <button>Broneeri kohad</button>
+      </router-link>
+    </div>
   </div>
 </template>
 
