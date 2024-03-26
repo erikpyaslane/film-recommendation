@@ -49,5 +49,9 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
+    public MovieDTO createMovie(MovieDTO movieDTO) {
+        return movieDTOMapper.MovieToDTO(movieRepository.save(movieDTOMapper.DTOToMovie(movieDTO)));
+    }
+
 
 }

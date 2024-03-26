@@ -40,7 +40,7 @@ public class Movie {
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "movie_genres", joinColumns = @JoinColumn(name = "movie_id"))
     @Column(name = "genre")
-    private Set<Genre> genres = new HashSet<>();
+    private Set<Genre> genres;
 
     public Movie(String title, double rating, AgeRestriction ageRestriction, int releaseYear, Set<Genre> genres) {
         this.title = title;

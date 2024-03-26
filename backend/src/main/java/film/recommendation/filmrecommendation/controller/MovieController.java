@@ -31,4 +31,9 @@ public class MovieController {
     public ResponseEntity<MovieDTO> getMovieById(@PathVariable long id) throws FilmNotFoundException {
         return new ResponseEntity<>(movieService.getMovieById(id), HttpStatus.OK);
     }
+
+    @PostMapping
+    public ResponseEntity<MovieDTO> createMovie(@RequestBody MovieDTO movieDTO) {
+        return new ResponseEntity<>(movieService.createMovie(movieDTO), HttpStatus.CREATED);
+    }
 }
