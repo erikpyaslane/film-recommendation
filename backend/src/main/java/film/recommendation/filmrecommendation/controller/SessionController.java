@@ -6,10 +6,13 @@ import film.recommendation.filmrecommendation.exceptions.FilmNotFoundException;
 import film.recommendation.filmrecommendation.exceptions.SessionNotFoundException;
 import film.recommendation.filmrecommendation.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,7 +31,7 @@ public class SessionController {
         return new ResponseEntity<>(sessionService.getAllSessions(), HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/actual")
     public ResponseEntity<List<SessionDTO>> getActualSessions() throws SessionNotFoundException {
         return new ResponseEntity<>(sessionService.getAllActualSessions(), HttpStatus.OK);
     }
@@ -36,6 +39,15 @@ public class SessionController {
     @GetMapping("/{id}")
     public ResponseEntity<SessionDTO> getChosenSession(@PathVariable long id) throws SessionNotFoundException {
         return new ResponseEntity<>(sessionService.getChosenSession(id), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<SessionDTO>> getSessionsByDate(
+            @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime date)
+            throws SessionNotFoundException {
+        System.out.println(date);
+        return new ResponseEntity<>(sessionService.getSessionsByDateAndTime(date), HttpStatus.OK);
     }
 
     @PostMapping

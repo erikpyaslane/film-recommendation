@@ -1,6 +1,7 @@
 package film.recommendation.filmrecommendation.service;
 
 import film.recommendation.filmrecommendation.entity.*;
+import film.recommendation.filmrecommendation.enums.Genre;
 import film.recommendation.filmrecommendation.exceptions.FilmNotFoundException;
 import film.recommendation.filmrecommendation.exceptions.SessionNotFoundException;
 import film.recommendation.filmrecommendation.mapper.MovieDTOMapper;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -46,11 +48,42 @@ public class SessionService {
     public List<SessionDTO> getAllActualSessions() throws SessionNotFoundException {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now();
-        Optional<List<Session>> sessions = sessionRepository.findAllActualSessions(date, time);
+        List<Session> sessions = sessionRepository.findAllActualSessions(date, time);
         if (sessions.isEmpty())
             throw new SessionNotFoundException("No actual sessions found");
-        return sessions.get()
+        return sessions
                 .stream()
+                .map(sessionMapperDTO::SessionToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<SessionDTO> getAllSessionsByGenre(Genre genre) {
+        return sessionRepository.findAllSessionsByGenre(genre)
+                .stream()
+                .map(sessionMapperDTO::SessionToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<SessionDTO> getSessionsByDate(LocalDate date) throws SessionNotFoundException {
+        List<Session> sessions = sessionRepository.findAllByDateOfSession(date);
+        if (sessions.isEmpty())
+            throw new SessionNotFoundException("No sessions found");
+        return  sessions.stream()
+                .map(sessionMapperDTO::SessionToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<SessionDTO> getSessionsByDateAndTime(LocalDateTime datetime) throws SessionNotFoundException {
+
+        LocalDate date = datetime.toLocalDate();
+        LocalTime time = datetime.toLocalTime();
+        System.out.println(date);
+        System.out.println(time);
+        List<Session> sessions = sessionRepository
+                .findAllByDateOfSessionAndTimeOfSession(date, time);
+        if (sessions.isEmpty())
+            throw new SessionNotFoundException("No sessions found");
+        return sessions.stream()
                 .map(sessionMapperDTO::SessionToDTO)
                 .collect(Collectors.toList());
     }

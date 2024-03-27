@@ -4,12 +4,13 @@
     <div v-for="(row, indexX) in session.seats" :key="indexX" style="display: flex; flex-direction: column; align-items: center;">
       <div style="display: flex; flex-direction: row;">
         <div v-for="(col, indexY) in row" :key="indexY">
-          <div v-if="isRecommendedSeat(indexX, indexY)">
-            <button style="background-color: green;" disabled></button>
-          </div>
-          <div v-else-if="session.seats[indexX][indexY] === true" @click="incrementReservedSeats">
+          <div v-if="session.seats[indexX][indexY] === true" @click="incrementReservedSeats">
             <button style="background-color: red;" disabled></button>
           </div>
+          <div v-else-if="isRecommendedSeat(indexX, indexY)">
+            <button style="background-color: green;" disabled></button>
+          </div>
+
           <div v-else>
             <button style="background-color: gray;"></button>
           </div>
@@ -47,6 +48,7 @@ export default {
       const response2 = await
           axios.get(`http://localhost:8080/api/sessions/${this.$route.params.id}/free_seats=${3}`);
       this.recommendedSeats = response2.data;
+      console.log(this.recommendedSeats)
     } catch (error) {
       console.error("Not found such session!")
     }
@@ -56,7 +58,16 @@ export default {
       this.reservedSeats++;
     },
     isRecommendedSeat(indexX, indexY) {
-      return this.recommendedSeats.some(seat => seat[0] === indexX && seat[1] === indexY);
+      if (this.recommendedSeats === null) {
+        return false;
+      }
+      for (let i = 0; i < this.recommendedSeats.length; i++) {
+        if (Array.isArray(this.recommendedSeats[i]) && this.recommendedSeats[i].length === 2) {
+          if (this.recommendedSeats[i][0] === indexX && this.recommendedSeats[i][1] === indexY) {
+            return true; // Coordinates found, return true
+          }
+        }
+      }
     }
   },
   computed: {
@@ -74,8 +85,6 @@ export default {
   }
 };
 </script>
-
-
 
 <style scoped>
 button {

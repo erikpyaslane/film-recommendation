@@ -9,9 +9,8 @@ public enum Genre {
     DOCUMENTARY("Dokumentaal"), DRAMA("Draama"), FAMILY("Pere"),
     FANTASY("Ulmefilm"), HISTORY("Ajalugu"), HORROR("Õudus"),
     MUSIC("Musikaalne"), MYSTERY("Müstika"), ROMANCE("Romantika"),
-    SCI_FI("Teaduslik"), SPORT("Sport"), THRILLER("Triller"),
-    WAR("Sõda"), WESTERN("Lääne"),
-    NOPE("");
+    SPORT("Sport"), THRILLER("Triller"), WAR("Sõda"),
+    WESTERN("Lääne"), NOPE("");
 
     private final String nameEstonian;
 

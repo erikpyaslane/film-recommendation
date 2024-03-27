@@ -2,6 +2,9 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import * as VueRouter from 'vue-router'
 
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
 import SessionsPage from "@/pages/SessionsPage.vue";
 import SeatsPage from "@/pages/SeatsPage.vue";
 
