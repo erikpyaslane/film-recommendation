@@ -2,6 +2,7 @@ package film.recommendation.filmrecommendation.controller;
 
 import film.recommendation.filmrecommendation.entity.SessionDTO;
 import film.recommendation.filmrecommendation.entity.SessionDTOWithoutId;
+import film.recommendation.filmrecommendation.enums.AgeRestriction;
 import film.recommendation.filmrecommendation.exceptions.FilmNotFoundException;
 import film.recommendation.filmrecommendation.exceptions.SessionNotFoundException;
 import film.recommendation.filmrecommendation.service.SessionService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/sessions")
@@ -26,28 +28,30 @@ public class SessionController {
         this.sessionService = sessionService;
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<SessionDTO>> getAllSessions() throws SessionNotFoundException {
-        return new ResponseEntity<>(sessionService.getAllSessions(), HttpStatus.OK);
-    }
-
-    @GetMapping("/actual")
-    public ResponseEntity<List<SessionDTO>> getActualSessions() throws SessionNotFoundException {
-        return new ResponseEntity<>(sessionService.getAllActualSessions(), HttpStatus.OK);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<SessionDTO> getChosenSession(@PathVariable long id) throws SessionNotFoundException {
         return new ResponseEntity<>(sessionService.getChosenSession(id), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<SessionDTO>> getSessionsByDate(
+    public ResponseEntity<List<SessionDTO>> getSessionsByFilters(
             @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime date)
+            LocalDateTime date,
+            @RequestParam(name="genres", required = false) Set<String> genres,
+            @RequestParam(name="ageRestrictions", required = false) Set<String> ageRestrictions)
             throws SessionNotFoundException {
-        System.out.println(date);
-        return new ResponseEntity<>(sessionService.getSessionsByDateAndTime(date), HttpStatus.OK);
+        return new ResponseEntity<>(
+                sessionService.getAllSessionsWithFilters(date, genres, ageRestrictions),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<SessionDTO>> getAllSessions() {
+        return new ResponseEntity<>(
+                sessionService.getAllSessions(),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping

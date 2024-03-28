@@ -1,7 +1,6 @@
 package film.recommendation.filmrecommendation.controller;
 
 
-import film.recommendation.filmrecommendation.enums.AgeRestriction;
 import film.recommendation.filmrecommendation.service.AgeRestrictionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,8 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Idee selle klassi loomiseks andis ChatGPT https://chat.openai.com/c/8c226f24-4615-4c0c-8ef9-5fbd6eac5363
@@ -29,7 +27,7 @@ public class AgeRestrictionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AgeRestriction>> getAgeRestrictions() {
+    public ResponseEntity<Set<String>> getAgeRestrictions() {
         return new ResponseEntity<>(ageRestrictionService.getAllAgeRestrictions(), HttpStatus.OK);
     }
 

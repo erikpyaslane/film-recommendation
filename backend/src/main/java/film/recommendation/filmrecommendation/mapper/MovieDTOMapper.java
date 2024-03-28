@@ -22,14 +22,13 @@ public class MovieDTOMapper {
                 movie.getReleaseYear(),
                 movie.getGenres()
                         .stream()
-                        .map(Genre::name)
+                        .map(Genre::getNameEstonian)
                         .collect(Collectors.toSet())
         );
     }
 
     public Movie DTOWithoutIdToMovie(MovieDTOWithoutId movieDTO) {
         //Converts list of genres(as String) to Set<Genre>
-
 
         AgeRestriction ageRestriction = AgeRestriction
                 .getAgeRestrictionByName(String.valueOf(movieDTO.ageRestriction()));

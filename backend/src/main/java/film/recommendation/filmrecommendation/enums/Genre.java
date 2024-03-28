@@ -10,7 +10,7 @@ public enum Genre {
     FANTASY("Ulmefilm"), HISTORY("Ajalugu"), HORROR("Õudus"),
     MUSIC("Musikaalne"), MYSTERY("Müstika"), ROMANCE("Romantika"),
     SPORT("Sport"), THRILLER("Triller"), WAR("Sõda"),
-    WESTERN("Lääne"), NOPE("");
+    WESTERN("Lääne");
 
     private final String nameEstonian;
 
@@ -20,10 +20,10 @@ public enum Genre {
 
     public static Genre getGenreByEstonianName(String nameEstonian) {
         for (Genre genre : values()) {
-            if (nameEstonian.equals(genre.nameEstonian))
+            if (nameEstonian.equals(genre.getNameEstonian()))
                 return genre;
         }
-        return NOPE;
+        return null;
     }
 
 }

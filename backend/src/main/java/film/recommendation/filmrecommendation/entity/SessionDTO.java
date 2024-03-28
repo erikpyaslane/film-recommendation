@@ -7,7 +7,8 @@ import java.time.LocalTime;
 
 public record SessionDTO (
         Long id,
-        Movie movie,
+
+        MovieDTO movie,
 
         LocalDate dateOfSession,
 

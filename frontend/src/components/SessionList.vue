@@ -10,30 +10,50 @@ ChatGPT https://chat.openai.com/c/a7a92d90-8b30-48ad-9209-ce7e288d4a57
              :key="index"
              :class="['schedule-day', { 'active': index === activeDayIndex }]"
              @click="setActiveDay(index)"
-              class="py-2">
+             class="py-2">
 
           {{ day }}
         </div>
       </div>
       <div class="dropdown col-md-2">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="genreDropdownButton" @click="toggleDropdown('genre')">
+        <button
+            class="btn btn-secondary dropdown-toggle"
+            type="button"
+            id="genreDropdownButton"
+            @click="toggleDropdown('genre')"
+        >
           Žanrid
         </button>
-        <div class="dropdown-menu" :class="{ 'show': isGenreDropdownOpen }" aria-labelledby="genreDropdownButton">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <a class="dropdown-item" href="#">Something else here</a>
+        <div
+            class="dropdown-menu"
+            :class="{ 'show': isGenreDropdownOpen }"
+            aria-labelledby="genreDropdownButton"
+        >
+          <div v-for="(genre, index) in genres" :key="index">
+            <label>
+              <input type="checkbox" v-model="chosenGenres" :value="genre" >
+              {{ genre }}
+            </label>
+          </div>
         </div>
       </div>
 
       <div class="dropdown col-md-2">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="ageDropdownButton" @click="toggleDropdown('age')">
+        <button
+            class="btn btn-secondary dropdown-toggle"
+            type="button"
+            id="ageDropdownButton"
+            @click="toggleDropdown('age')"
+        >
           Vanuse piirangud
         </button>
         <div class="dropdown-menu" :class="{ 'show': isAgeDropdownOpen }" aria-labelledby="ageDropdownButton">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <a class="dropdown-item" href="#">Something else here</a>
+          <div v-for="(restriction, index) in ageRestrictions" :key="index">
+            <label>
+              <input type="checkbox" v-model="chosenRestrictions" :value="restriction">
+              {{ restriction }}
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -43,11 +63,12 @@ ChatGPT https://chat.openai.com/c/a7a92d90-8b30-48ad-9209-ce7e288d4a57
     <div v-else class="mt-5">
       <div v-for="(session) in filteredSessions" :key="session.id">
         <div class="session-details">
-          <!-- First Row -->
           <div class="grid-container">
-            <div class="time"><h5>Algus:</h5><h1>{{ session.timeOfSession }}</h1></div>
+            <div class="time"><h5>Algus:</h5>
+              <h1>{{ session.timeOfSession }}</h1></div>
             <div class="title"><h1>{{ session.movie.title }}</h1></div>
-            <div class="rating"><h5>Rating:</h5><h1>{{ session.movie.rating }}</h1></div>
+            <div class="rating"><h5>Rating:</h5>
+              <h1>{{ session.movie.rating }}</h1></div>
           </div>
           <!-- Second Row -->
           <div class="second-row flex justify-content-between">
@@ -86,6 +107,9 @@ export default {
       nextSevenDates: [],
       filteredSessions: [],
       ageRestrictions: [],
+      genres: [],
+      chosenRestrictions: [],
+      chosenGenres: [],
       activeDayIndex: 0,
     };
   },
@@ -99,8 +123,10 @@ export default {
         }
       });
       const response2 = await axios.get("http://localhost:8080/api/age_restrictions");
+      const response3 = await axios.get("http://localhost:8080/api/genres");
       this.ageRestrictions = response2.data;
       this.filteredSessions = response1.data;
+      this.genres = response3.data;
     } catch (error) {
       console.error("Error :", error);
       this.filteredSessions = [];
@@ -112,10 +138,13 @@ export default {
   methods: {
     filterSessions(date) {
       try {
+        console.log(this.chosenGenres)
         axios.get("http://localhost:8080/api/sessions", {
           params: {
-            date: date
-          }
+            date: date,
+            genres: this.chosenGenres.join(','),
+            ageRestrictions: this.chosenRestrictions.join(',')
+          },
         }).then(response => {
           console.log(response.data);
           this.filteredSessions = response.data;
@@ -280,5 +309,9 @@ button:active {
 
 .filter-line {
   background-color: black;
+}
+
+select {
+  min-height: 150px;
 }
 </style>

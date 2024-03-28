@@ -1,5 +1,8 @@
 package film.recommendation.filmrecommendation.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum AgeRestriction {
     G("G"),
     PG("PG"),
@@ -20,4 +23,6 @@ public enum AgeRestriction {
         }
         return G;
     }
+
+
 }
