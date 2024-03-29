@@ -42,7 +42,7 @@ NB! POST meetodite näided asuvad cotrollertite kirjelduses
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-Kokkuvõte projektist:
+## Kokkuvõte projektist:
 Kokku projekti tegemisele kuulus umbes 30 tundi.
 Tegemata jäi osa seotud vaatamiste ajalooga.
 Selle probleemi lahendus oleks selline, et oleks vaja luua tabel andbmebaasis, 
