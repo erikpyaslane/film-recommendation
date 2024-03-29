@@ -38,10 +38,10 @@ public class SessionController {
             @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime date,
             @RequestParam(name="genres", required = false) Set<String> genres,
-            @RequestParam(name="ageRestrictions", required = false) Set<String> ageRestrictions)
-            throws SessionNotFoundException {
+            @RequestParam(name="ageRestrictions", required = false) Set<String> ageRestrictions,
+            @RequestParam(name="languages", required = false) Set<String> languages) {
         return new ResponseEntity<>(
-                sessionService.getAllSessionsWithFilters(date, genres, ageRestrictions),
+                sessionService.getAllSessionsWithFilters(date, genres, ageRestrictions, languages),
                 HttpStatus.OK
         );
     }

@@ -1,10 +1,10 @@
 package film.recommendation.filmrecommendation.utils;
 
-import film.recommendation.filmrecommendation.exceptions.NotFoundSoManySeatsException;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.Random;
+
+import static java.util.Arrays.copyOfRange;
 
 @Component
 public class SeatRecommender {
@@ -13,7 +13,7 @@ public class SeatRecommender {
         int reservedSeats = getReservedSeatCount(seats);
         int totalSeats = seats.length * seats[0].length;
         if (totalSeats - reservedSeats < seatCount)
-            throw new NullPointerException();
+            return new int[][]{};
         if (seatCount > seats.length)
             return bestSeparateSeats(seats, seatCount);
         return bestSeats(seats, seatCount);
@@ -21,86 +21,166 @@ public class SeatRecommender {
 
     private static int[][] bestSeats(boolean[][] seats, int neededSeatCount) {
 
+        int totalFreeSeats = seats.length * seats[0].length - getReservedSeatCount(seats);
+        int[] temporaryResult;
+
+        if (neededSeatCount > totalFreeSeats)
+            return null;
+
         int middleRow = seats.length / 2;
-        int middleSeat = seats[0].length / 2;
-        int downRow = seats.length % 2 == 0 ? middleRow - 1 : middleRow;
         int upRow = middleRow;
+        int downRow;
 
-        int[] freeSeatsInRow;
-        if (downRow == upRow) {
-            freeSeatsInRow = findSeatsInRow(seats[middleRow], middleSeat, neededSeatCount);
-            upRow++;
+        if (seats.length % 2 == 0)
+            downRow = upRow-1;
+        else
+            downRow = upRow;
+
+        while (upRow < seats.length || downRow >= 0) {
+            if (upRow == downRow) {
+                temporaryResult = seatsInOneRow(seats[middleRow], neededSeatCount);
+                if (temporaryResult != null)
+                    return convertTo2DArray(temporaryResult,middleRow);
+                upRow++;
+            }
+            else {
+                temporaryResult = seatsInOneRow(seats[upRow], neededSeatCount);
+                if (temporaryResult != null)
+                    return convertTo2DArray(temporaryResult, upRow);
+                upRow++;
+                temporaryResult = seatsInOneRow(seats[downRow], neededSeatCount);
+                if (temporaryResult != null)
+                    return convertTo2DArray(temporaryResult, downRow);
+            }
             downRow--;
-            if (freeSeatsInRow != null)
-                return convertTo2DArray(freeSeatsInRow, middleSeat);
-        }
-
-        while (downRow >= 0 || upRow < seats.length) {
-
-            freeSeatsInRow = findSeatsInRow(seats[upRow], middleSeat, neededSeatCount);
-            if (freeSeatsInRow != null)
-                return convertTo2DArray(freeSeatsInRow, upRow);
-            freeSeatsInRow = findSeatsInRow(seats[downRow], middleSeat, neededSeatCount);
-            if (freeSeatsInRow != null)
-                return convertTo2DArray(freeSeatsInRow, downRow);
-            upRow++;
-            downRow--;
-
         }
 
         return bestSeparateSeats(seats, neededSeatCount);
     }
 
     private static int[][] bestSeparateSeats(boolean[][] seats, int seatCount) {
-        int middleRow = seats.length;
-        int i = 0;
-        //for (int j = middleRow + i; i < middleRow; i++, j++) {}
-        return new int[][]{{2, 1}, {2, 2}, {2, 3}};
-    }
+        int[][] result = new int[seatCount][2];
+        int counter = 0;
+        int middleRow = seats.length/2;
+        int upRow = middleRow;
+        int downRow;
 
+        if (seats.length % 2 == 0)
+            downRow = upRow-1;
+        else
+            downRow = upRow;
 
-    private static int[][] convertTo2DArray(int[] freeSeats, int middleSeat) {
-        int[][] seats = new int[freeSeats.length][2];
-
-        for (int i = 0; i < freeSeats.length; i++) {
-            seats[i][0] = middleSeat;
-            seats[i][1] = freeSeats[i];
+        while ((downRow >= 0 || upRow < seats.length) && seatCount != counter) {
+            if (downRow == upRow) {
+                counter = reserveFreeSeats(seats[middleRow], middleRow, counter, result);
+                downRow--;
+                upRow++;
+            }
+            else {
+                counter = reserveFreeSeats(seats[upRow], upRow, counter, result);
+                upRow++;
+                counter = reserveFreeSeats(seats[downRow], downRow, counter, result);
+                downRow--;
+            }
         }
-
-        return seats;
+        return result;
     }
 
-    private static int[] findSeatsInRow(boolean[] seats, int middleSeat, int seatCount) {
-        int[] seatsToBook = new int[seatCount];
-        int left = middleSeat;
-        int right = middleSeat;
 
-        while (left >= 0 && right < seats.length){
-            if (seatCount == 0)
-                return seatsToBook;
-            else if (right == left) {
-                if (!seats[middleSeat]){
-                    seatCount--;
-                    seatsToBook[seatCount] = middleSeat;
+    private static int reserveFreeSeats(boolean[] seats, int rowNumber, int counter, int[][] temporaryResult) {
+        int center = seats.length / 2;
+        int left, right;
+        if (seats.length % 2 == 0) {
+            right = center;
+            left = right - 1;
+        }
+        else left = right = center;
+
+        while ((left >= 0 || right < seats.length) && counter != temporaryResult.length){
+            if (left == right) {
+                if (!seats[center]) {
+                    temporaryResult[counter][0] = rowNumber;
+                    temporaryResult[counter][1] = center;
+                    counter++;
+                    left--;
+                    right++;
+                }
+            }
+            else {
+                if (!seats[left]) {
+                    temporaryResult[counter][0] = rowNumber;
+                    temporaryResult[counter][1] = left;
+                    counter++;
+                }
+                left--;
+                if (counter == temporaryResult.length)
+                    break;
+                if (!seats[right]) {
+                    temporaryResult[counter][0] = rowNumber;
+                    temporaryResult[counter][1] = right;
+                    counter++;
                 }
                 right++;
-                left--;
             }
-            else if (!seats[left]){
-                seatCount--;
-                seatsToBook[seatCount] = left;
-                left--;
+        }
+        return counter;
+    }
+
+
+    public static int[] seatsInOneRow(boolean[] seats, int numOfSeats) {
+        if (numOfSeats > seats.length) {
+            return null;
+        }
+
+        boolean[] resultNeeded = new boolean[numOfSeats];
+        Arrays.fill(resultNeeded, false);
+
+
+        int centerOfRow = seats.length / 2;
+        int left, right;
+        if (seats.length % 2 == 0) {
+            if (resultNeeded.length % 2 == 0)
+                left = right = centerOfRow - resultNeeded.length / 2;
+            else {
+                right = centerOfRow - resultNeeded.length / 2;
+                left = right - 1;
             }
-            else if (!seats[right]) {
-                seatCount--;
-                seatsToBook[seatCount] = right;
+
+        } else {
+            if (resultNeeded.length % 2 == 1) {
+                left = right = centerOfRow - resultNeeded.length / 2;
+            } else {
+                left = centerOfRow - resultNeeded.length / 2;
+                right = left + 1;
+            }
+        }
+
+
+        while (left >= 0 || right+numOfSeats < seats.length) {
+            if (left == right) {
+                if (Arrays.equals(resultNeeded, copyOfRange(
+                        seats, left, left + resultNeeded.length))) {
+                    return createIntArray(left, numOfSeats);
+                }
+                left--;
+                right++;
+            } else {
+
+                if (Arrays.equals(resultNeeded, copyOfRange(
+                        seats, left, left + numOfSeats))) {
+                    return createIntArray(left, numOfSeats);
+                }
+                else if (Arrays.equals(resultNeeded, copyOfRange(
+                        seats, right, right + numOfSeats))) {
+                    return createIntArray(right, numOfSeats);
+                }
+
+                left--;
                 right++;
             }
         }
 
-        if (seatCount == 0)
-            return seatsToBook;
-        return new int[]{1,2,3};
+        return null;
     }
 
     private static int getReservedSeatCount(boolean[][] seats) {
@@ -112,5 +192,23 @@ public class SeatRecommender {
             }
         }
         return reservedSeats;
+    }
+
+    public static int[] createIntArray(int startIndex, int countOfSeats) {
+        int[] output = new int[countOfSeats];
+        for (int index = 0, seat = startIndex; index < countOfSeats; index++, seat++)
+            output[index] = seat;
+        return output;
+    }
+
+    private static int[][] convertTo2DArray(int[] freeSeats, int middleSeat) {
+        int[][] seats = new int[freeSeats.length][2];
+
+        for (int i = 0; i < freeSeats.length; i++) {
+            seats[i][0] = middleSeat;
+            seats[i][1] = freeSeats[i];
+        }
+
+        return seats;
     }
 }

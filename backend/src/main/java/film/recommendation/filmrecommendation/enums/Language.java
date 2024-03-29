@@ -1,13 +1,17 @@
 package film.recommendation.filmrecommendation.enums;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@AllArgsConstructor
+@Getter
 public enum Language {
     EST ("Eesti"),
     ENG ("Inglise");
 
     private final String name;
+
+    Language(String name) {
+        this.name = name;
+    }
 
     public static Language getLanguageByStringValue(String string) {
         for (Language language : values()) {

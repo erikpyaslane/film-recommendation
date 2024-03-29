@@ -3,6 +3,7 @@ package film.recommendation.filmrecommendation.service;
 import film.recommendation.filmrecommendation.entity.*;
 import film.recommendation.filmrecommendation.enums.AgeRestriction;
 import film.recommendation.filmrecommendation.enums.Genre;
+import film.recommendation.filmrecommendation.enums.Language;
 import film.recommendation.filmrecommendation.exceptions.FilmNotFoundException;
 import film.recommendation.filmrecommendation.exceptions.SessionNotFoundException;
 import film.recommendation.filmrecommendation.mapper.MovieDTOMapper;
@@ -15,10 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,85 +44,55 @@ public class SessionService {
     }
 
     public List<SessionDTO> getAllSessionsWithFilters(
-            LocalDateTime datetime, Set<String> genresString, Set<String> ageRestrictionsString)
-            throws SessionNotFoundException {
-
-        if ((genresString == null || genresString.isEmpty()) &&
-                (ageRestrictionsString == null|| ageRestrictionsString.isEmpty()))
-            return getSessionsByDateAndTime(datetime);
-
-        Set<Genre> genres;
-        Set<AgeRestriction> ageRestrictions;
-
-        if (genresString == null || genresString.isEmpty()) {
-            ageRestrictions = ageRestrictionsString
-                    .stream()
-                    .map(AgeRestriction::getAgeRestrictionByName)
-                    .collect(Collectors.toSet());
-            return getAllSessionsByAgeRestrictions(datetime, ageRestrictions);
-        }
-
-        if (ageRestrictionsString == null || ageRestrictionsString.isEmpty()) {
-            genres = genresString.stream()
-                    .map(Genre::getGenreByEstonianName)
-                    .collect(Collectors.toSet());
-            return getAllSessionsByGenres(datetime, genres);
-        }
-
-        return getSessionsByDateAndTime(datetime);
-    }
-
-    public List<SessionDTO> getAllSessionsByAgeRestrictions(LocalDateTime datetime, Set<AgeRestriction> ageRestrictions) {
-        LocalDate date = datetime.toLocalDate();
-        LocalTime time = datetime.toLocalTime();
-
-        if (date.isEqual(LocalDate.now()))
-            return sessionRepository
-                    .findAllSessionsByCurrentDateAndTimeAndAgeRestrictionList(ageRestrictions, date, time)
-                    .stream()
-                    .map(sessionMapperDTO::SessionToDTO)
-                    .collect(Collectors.toList());
-
-        return sessionRepository.findAllByDateAndAgeRestrictionList(ageRestrictions, date)
-                .stream()
-                .map(sessionMapperDTO::SessionToDTO)
-                .collect(Collectors.toList());
-
-    }
-
-    public List<SessionDTO> getAllSessionsByGenres(LocalDateTime datetime, Set<Genre> genres) {
+            LocalDateTime datetime, Set<String> genresString,
+            Set<String> ageRestrictionsString, Set<String> languagesString) {
 
         LocalDate date = datetime.toLocalDate();
         LocalTime time = datetime.toLocalTime();
 
-        if (date.isEqual(LocalDate.now()))
-            return sessionRepository.findAllSessionsByGenresAndCurrentDate(genres, time)
-                    .stream()
-                    .map(sessionMapperDTO::SessionToDTO)
-                    .collect(Collectors.toList());
+        Set<Genre> genres = mapToGenres(genresString);
+        Set<AgeRestriction> ageRestrictions = mapToAgeRestrictions(ageRestrictionsString);
+        Set<Language> languages = mapToLanguages(languagesString);
 
-        return sessionRepository.findAllSessionsByGenresAndDate(genres, date)
-                .stream()
-                .map(sessionMapperDTO::SessionToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<SessionDTO> getSessionsByDateAndTime(LocalDateTime datetime) throws SessionNotFoundException {
-
-        LocalDate date = datetime.toLocalDate();
-        LocalTime time = datetime.toLocalTime();
         List<Session> sessions;
-
-        if (!date.isEqual(LocalDate.now()))
-            sessions = sessionRepository.findAllByDate(date);
-        else
-            sessions = sessionRepository
-                .findAllByDateAndTime(date, time);
+        if (date.isEqual(LocalDate.now())) {
+            sessions = sessionRepository.findAllSessionsByFiltersAndCurrentDate(date, time, genres, ageRestrictions, languages);
+        } else {
+            sessions = sessionRepository.findAllSessionsByFilters(date, genres, ageRestrictions, languages);
+        }
 
         return sessions.stream()
                 .map(sessionMapperDTO::SessionToDTO)
                 .collect(Collectors.toList());
     }
+
+    private Set<Genre> mapToGenres(Set<String> genresString) {
+        if (genresString == null || genresString.isEmpty()) {
+            return null;
+        }
+        return genresString.stream()
+                .map(Genre::getGenreByEstonianName)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<AgeRestriction> mapToAgeRestrictions(Set<String> ageRestrictionsString) {
+        if (ageRestrictionsString == null || ageRestrictionsString.isEmpty()) {
+            return null;
+        }
+        return ageRestrictionsString.stream()
+                .map(AgeRestriction::getAgeRestrictionByName)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Language> mapToLanguages(Set<String> languagesString) {
+        if (languagesString == null || languagesString.isEmpty()) {
+            return null;
+        }
+        return languagesString.stream()
+                .map(Language::getLanguageByStringValue)
+                .collect(Collectors.toSet());
+    }
+
 
     public SessionDTO getChosenSession(long id) throws SessionNotFoundException {
         Optional<Session> optionalSession = sessionRepository.findById(id);

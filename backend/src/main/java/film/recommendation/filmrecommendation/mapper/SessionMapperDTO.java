@@ -33,7 +33,7 @@ public class SessionMapperDTO {
                 movieDTOMapper.MovieToDTO(session.getMovie()),
                 session.getDateOfSession(),
                 session.getTimeOfSession(),
-                session.getLanguage(),
+                session.getLanguage().getName(),
                 session.getSeats()
         );
     }

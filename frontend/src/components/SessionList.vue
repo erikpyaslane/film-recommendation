@@ -4,6 +4,9 @@ ChatGPT https://chat.openai.com/c/a7a92d90-8b30-48ad-9209-ce7e288d4a57
 
 <template>
   <div class="flex w-100 justify-content-center align-items-center">
+    <!--
+      Filtrite riba.
+    -->
     <div class="w-100 flex row justify-content-center align-items-center filter-line mx-0">
       <div class="schedule-line col-md-7 flex justify-content-center align-self-center">
         <div v-for="(day, index) in nextSevenDays"
@@ -15,48 +18,67 @@ ChatGPT https://chat.openai.com/c/a7a92d90-8b30-48ad-9209-ce7e288d4a57
           {{ day }}
         </div>
       </div>
-      <div class="dropdown col-md-2">
-        <button
-            class="btn btn-secondary dropdown-toggle"
-            type="button"
-            id="genreDropdownButton"
-            @click="toggleDropdown('genre')"
-        >
-          Žanrid
-        </button>
-        <div
-            class="dropdown-menu"
-            :class="{ 'show': isGenreDropdownOpen }"
-            aria-labelledby="genreDropdownButton"
-        >
-          <div v-for="(genre, index) in genres" :key="index">
-            <label>
-              <input type="checkbox" v-model="chosenGenres" :value="genre" >
-              {{ genre }}
-            </label>
+      <div class="col-md-5 d-flex flex-row">
+        <div class="dropdown col-md-4">
+          <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="genreDropdownButton"
+              @click="toggleDropdown('genre')"
+          >
+            Žanrid
+          </button>
+          <div
+              class="dropdown-menu"
+              :class="{ 'show': isGenreDropdownOpen }"
+              aria-labelledby="genreDropdownButton"
+          >
+            <div v-for="(genre, index) in genres" :key="index">
+              <label>
+                <input type="checkbox" v-model="chosenGenres" :value="genre" >
+                {{ genre }}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="dropdown col-md-4">
+          <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="ageDropdownButton"
+              @click="toggleDropdown('age')"
+          >
+            Vanuse piirangud
+          </button>
+          <div class="dropdown-menu" :class="{ 'show': isAgeDropdownOpen }" aria-labelledby="ageDropdownButton">
+            <div v-for="(restriction, index) in ageRestrictions" :key="index">
+              <label>
+                <input type="checkbox" v-model="chosenRestrictions" :value="restriction">
+                {{ restriction }}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="dropdown col-md-4">
+          <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="ageDropdownButton"
+              @click="toggleDropdown('language')"
+          >
+            Keeled
+          </button>
+          <div class="dropdown-menu" :class="{ 'show': isLanguageDropdownOpen }" aria-labelledby="languageDropdownButton">
+            <div v-for="(language, index) in languages" :key="index">
+              <label>
+                <input type="checkbox" v-model="chosenLanguages" :value="language">
+                {{ language }}
+              </label>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="dropdown col-md-2">
-        <button
-            class="btn btn-secondary dropdown-toggle"
-            type="button"
-            id="ageDropdownButton"
-            @click="toggleDropdown('age')"
-        >
-          Vanuse piirangud
-        </button>
-        {{this.chosenRestrictions}}
-        <div class="dropdown-menu" :class="{ 'show': isAgeDropdownOpen }" aria-labelledby="ageDropdownButton">
-          <div v-for="(restriction, index) in ageRestrictions" :key="index">
-            <label>
-              <input type="checkbox" v-model="chosenRestrictions" :value="restriction">
-              {{ restriction }}
-            </label>
-          </div>
-        </div>
-      </div>
     </div>
     <div v-if="filteredSessions.length === 0">
       <p>No sessions available</p>
@@ -71,7 +93,6 @@ ChatGPT https://chat.openai.com/c/a7a92d90-8b30-48ad-9209-ce7e288d4a57
             <div class="rating"><h5>Rating:</h5>
               <h1>{{ session.movie.rating }}</h1></div>
           </div>
-          <!-- Second Row -->
           <div class="second-row flex justify-content-between">
             <div class="movie-details">
               <p><strong>Vanuse reiting:</strong> {{ session.movie.ageRestriction }}</p>
@@ -104,13 +125,21 @@ export default {
     return {
       isGenreDropdownOpen: false,
       isAgeDropdownOpen: false,
+      isLanguageDropdownOpen: false,
+
       nextSevenDays: [],
       nextSevenDates: [],
+
       filteredSessions: [],
+
       ageRestrictions: [],
       genres: [],
+      languages: [],
+
       chosenRestrictions: [],
       chosenGenres: [],
+      chosenLanguages: [],
+
       activeDayIndex: 0,
     };
   },
@@ -123,11 +152,17 @@ export default {
           date: currentDate
         }
       });
+
       const response2 = await axios.get("http://localhost:8080/api/age_restrictions");
       const response3 = await axios.get("http://localhost:8080/api/genres");
+      const response4 = await axios.get("http://localhost:8080/api/languages");
+
       this.ageRestrictions = response2.data;
       this.filteredSessions = response1.data;
       this.genres = response3.data;
+      this.languages = response4.data;
+      console.log(this.filteredSessions)
+
     } catch (error) {
       console.error("Error :", error);
       this.filteredSessions = [];
@@ -144,7 +179,8 @@ export default {
           params: {
             date: date,
             genres: this.chosenGenres.join(','),
-            ageRestrictions: this.chosenRestrictions.join(',')
+            ageRestrictions: this.chosenRestrictions.join(','),
+            languages: this.chosenLanguages.join(',')
           },
         }).then(response => {
           console.log(response.data);
@@ -173,10 +209,16 @@ export default {
     toggleDropdown(dropdown) {
       if (dropdown === 'genre') {
         this.isGenreDropdownOpen = !this.isGenreDropdownOpen;
-        this.isAgeDropdownOpen = false; // Close other dropdowns if needed
+        this.isAgeDropdownOpen = false;
+        this.isLanguageDropdownOpen = false;
       } else if (dropdown === 'age') {
         this.isAgeDropdownOpen = !this.isAgeDropdownOpen;
-        this.isGenreDropdownOpen = false; // Close other dropdowns if needed
+        this.isGenreDropdownOpen = false;
+        this.isLanguageDropdownOpen = false;
+      } else if (dropdown === 'language') {
+        this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
+        this.isGenreDropdownOpen = false;
+        this.isAgeDropdownOpen = false;
       }
     },
     generateNextSevenDays() {

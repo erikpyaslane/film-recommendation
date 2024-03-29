@@ -14,7 +14,7 @@ public record SessionDTO (
 
         LocalTime timeOfSession,
 
-        Language language,
+        String language,
 
         boolean[][] seats
 ) {
