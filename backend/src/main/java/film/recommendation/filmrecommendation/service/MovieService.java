@@ -27,6 +27,11 @@ public class MovieService {
         this.movieDTOMapper = movieDTOMapper;
     }
 
+    /**
+     * Retrieves all movies
+     *
+     * @return list of movies
+     */
     public List<MovieDTO> getAllMovies() {
         return movieRepository.findAll()
                 .stream()
@@ -34,6 +39,12 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves movie by its id
+     *
+     * @param id the id of movie
+     * @return DTO of target movie
+     */
     public MovieDTO getMovieById(long id) throws FilmNotFoundException {
         Optional<Movie> movie = movieRepository.findById(id);
         if (movie.isEmpty())
@@ -41,15 +52,12 @@ public class MovieService {
         return movieDTOMapper.MovieToDTO(movie.get());
     }
 
-    public List<MovieDTO> getMoviesByGenre(Genre genre) throws FilmNotFoundException {
-        Optional<List<Movie>> movies = movieRepository.findAllByGenresIsNotContainingIgnoreCase(genre);
-        if (movies.isEmpty())
-            throw new FilmNotFoundException("No film with given genre");
-        return movies.get().stream()
-                .map(movieDTOMapper::MovieToDTO)
-                .collect(Collectors.toList());
-    }
-
+    /**
+     * Creates movie
+     *
+     * @param movieDTO parameters of movie to create
+     * @return DTO of movie
+     */
     public MovieDTO createMovie(MovieDTOWithoutId movieDTO) {
         return movieDTOMapper.MovieToDTO(
                 movieRepository.save(

@@ -105,7 +105,7 @@ ChatGPT https://chat.openai.com/c/a7a92d90-8b30-48ad-9209-ce7e288d4a57
               <p><strong>Keel:</strong> {{ session.language }}</p>
             </div>
           </div>
-          <div class="button-container">
+          <div v-if="movieIsWatched(session.movie.id)" class="button-container">
             <router-link :to="'/session/' + session.id">
               <button>Broneeri kohad</button>
             </router-link>
@@ -172,6 +172,14 @@ export default {
     this.generateNextSevenDays();
   },
   methods: {
+    async movieIsWatched(id) {
+      try {
+        return (await axios.get(`http://localhost:8080/api/watched_movies/${id}`)).data;
+      } catch (error) {
+        console.log("Not such film")
+      }
+
+    },
     filterSessions(date) {
       try {
         console.log(this.chosenGenres)

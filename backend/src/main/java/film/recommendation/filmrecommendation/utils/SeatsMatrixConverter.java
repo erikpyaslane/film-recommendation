@@ -10,6 +10,9 @@ import jakarta.persistence.Converter;
 /**
  * Created with a help of ChatGPT:
  * <a href="https://chat.openai.com/c/13ce56cd-f939-4f93-b8a5-cfd3a3b4b20f">...</a>
+ *
+ *
+ * Konverteerib boolean[][] massiivi sobivale kujule andmebaasi jaoks
  */
 @Converter
 public class SeatsMatrixConverter implements AttributeConverter<boolean[][], String> {

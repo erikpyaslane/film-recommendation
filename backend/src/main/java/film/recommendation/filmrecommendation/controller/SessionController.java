@@ -2,7 +2,6 @@ package film.recommendation.filmrecommendation.controller;
 
 import film.recommendation.filmrecommendation.entity.SessionDTO;
 import film.recommendation.filmrecommendation.entity.SessionDTOWithoutId;
-import film.recommendation.filmrecommendation.enums.AgeRestriction;
 import film.recommendation.filmrecommendation.exceptions.FilmNotFoundException;
 import film.recommendation.filmrecommendation.exceptions.SessionNotFoundException;
 import film.recommendation.filmrecommendation.service.SessionService;
@@ -28,11 +27,28 @@ public class SessionController {
         this.sessionService = sessionService;
     }
 
+    /**
+     * Endpoint for getting chosen session
+     *
+     * @param id the id of session
+     * @return The DTO of found session
+     */
     @GetMapping("/{id}")
     public ResponseEntity<SessionDTO> getChosenSession(@PathVariable long id) throws SessionNotFoundException {
         return new ResponseEntity<>(sessionService.getChosenSession(id), HttpStatus.OK);
     }
 
+    /**
+     * Retrieves sessions that response to given filters (Possible to use in GUI)
+     * http://localhost:8081/sessions
+     *
+     * @param date date of session
+     * @param genres genres of movie
+     * @param ageRestrictions restrictions for movie
+     * @param languages language of movie
+     *
+     * @return list of sessions DTO
+     */
     @GetMapping
     public ResponseEntity<List<SessionDTO>> getSessionsByFilters(
             @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -46,6 +62,11 @@ public class SessionController {
         );
     }
 
+    /**
+     * Retrieves all existing sessions (Only for Postman)
+     *
+     * @return list of sessions DTO
+     */
     @GetMapping("/all")
     public ResponseEntity<List<SessionDTO>> getAllSessions() {
         return new ResponseEntity<>(
@@ -54,12 +75,34 @@ public class SessionController {
         );
     }
 
+    /**
+     *  Creates session
+     *
+     * @param sessionDTOWithoutId parameters of request
+     * @return DTO of created session
+     *
+     * POST http://localhost:8080/api/sessions
+     * {
+     *  "movieId": 11,
+     *  "dateOfSession": "2024-03-30",
+     *  "timeOfSession": "17:15:00",
+     *  "language": "Eesti"
+     * }
+     *
+     */
     @PostMapping
     public ResponseEntity<SessionDTO> createSession(@RequestBody SessionDTOWithoutId sessionDTOWithoutId)
             throws FilmNotFoundException {
         return new ResponseEntity<>(sessionService.saveSession(sessionDTOWithoutId), HttpStatus.CREATED);
     }
 
+    /**
+     * Retrieves the best free seats
+     *
+     * @param id of session
+     * @param seatsCount count of seats to recommend
+     * @return positions of seats as 2D array
+     */
     @GetMapping("/{id}/free_seats={seatsCount}")
     public ResponseEntity<int[][]> getFreeSeats(@PathVariable long id, @PathVariable int seatsCount)
             throws SessionNotFoundException {

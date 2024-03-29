@@ -36,6 +36,11 @@ public class SessionService {
         this.sessionMapperDTO = sessionMapperDTO;
     }
 
+    /**
+     * Retrieves all sessions (Available only with Postman)
+     *
+     * @return List of sessions DTO
+     */
     public List<SessionDTO> getAllSessions(){
         return sessionRepository.findAll()
                 .stream()
@@ -43,6 +48,16 @@ public class SessionService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves sessions that responds to chosen filters
+     * Available in GUI (http://localhost:8081/sessions)
+     *
+     * @param datetime date and time after current moment
+     * @param genresString genre list as String type
+     * @param ageRestrictionsString age restrictions list as String
+     * @param languagesString language of session
+     * @return list of sessions DTO
+     */
     public List<SessionDTO> getAllSessionsWithFilters(
             LocalDateTime datetime, Set<String> genresString,
             Set<String> ageRestrictionsString, Set<String> languagesString) {
@@ -66,6 +81,14 @@ public class SessionService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Convert set string  to enum set
+     *
+     * @param genresString list of genres as string
+     *
+     * @return set of enum genres
+     */
+
     private Set<Genre> mapToGenres(Set<String> genresString) {
         if (genresString == null || genresString.isEmpty()) {
             return null;
@@ -75,6 +98,13 @@ public class SessionService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Convert set string  to enum set
+     *
+     * @param ageRestrictionsString list of age restrictions as string
+     *
+     * @return set of enum age restrictions
+     */
     private Set<AgeRestriction> mapToAgeRestrictions(Set<String> ageRestrictionsString) {
         if (ageRestrictionsString == null || ageRestrictionsString.isEmpty()) {
             return null;
@@ -84,6 +114,12 @@ public class SessionService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Convert set string  to enum set
+     *
+     * @param languagesString language as string
+     * @return language as enum
+     */
     private Set<Language> mapToLanguages(Set<String> languagesString) {
         if (languagesString == null || languagesString.isEmpty()) {
             return null;
@@ -94,6 +130,12 @@ public class SessionService {
     }
 
 
+    /**
+     * Retrieves session by id
+     *
+     * @param id the ID of session
+     * @return target session DTO
+     */
     public SessionDTO getChosenSession(long id) throws SessionNotFoundException {
         Optional<Session> optionalSession = sessionRepository.findById(id);
         if (optionalSession.isEmpty())
@@ -101,6 +143,13 @@ public class SessionService {
         return sessionMapperDTO.SessionToDTO(optionalSession.get());
     }
 
+    /**
+     * Saves new session (Available only through Postman)
+     *
+     * @param sessionDTOWithoutId session DTO
+     * @return DTO of created session
+     *
+     */
     public SessionDTO saveSession(SessionDTOWithoutId sessionDTOWithoutId) throws FilmNotFoundException {
         MovieDTO movie = movieService.getMovieById(sessionDTOWithoutId.movieId());
         Session session = sessionMapperDTO
@@ -109,6 +158,13 @@ public class SessionService {
         return sessionMapperDTO.SessionToDTO(sessionRepository.save(session));
     }
 
+    /**
+     * Method, that complete algorithm of recommending free seats
+     *
+     * @param id the id of session
+     * @param countOfSeats count of seats to recommend
+     * @return position of given count of sits as 2D array
+     */
     public int[][] getTheBestFreeSeats(long id, int countOfSeats) throws SessionNotFoundException {
         SessionDTO session = getChosenSession(id);
         boolean[][] seats = session.seats();

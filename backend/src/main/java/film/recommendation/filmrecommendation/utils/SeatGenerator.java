@@ -2,6 +2,9 @@ package film.recommendation.filmrecommendation.utils;
 
 import java.util.Random;
 
+/**
+ * Class that generates cinema hall ranfomly
+ */
 public class SeatGenerator {
 
     public static boolean[][] fillSeats(int rows, int columns) {

@@ -6,6 +6,26 @@ import java.util.Arrays;
 
 import static java.util.Arrays.copyOfRange;
 
+
+/**
+ * Algorithm of creating recommended seats
+ *
+ * Idee:
+ * Luuakse boolean maatriks, kus false väärtus tähendab,
+ * et istekoht on vaba ja true näitab, et istekoht on kinni
+ *
+ * Siis hakatakse maatriksi läbi käima niimoodi, et valitakse keskmine rida.
+ * Ja siis läbitakse neid nii, et vaadakse (keskmine + 1) rida, seejärel (keskmine-1) rida, siis (keskmine + 2) jne.
+ *
+ * Kui vaadeldakse iga rida eraldi, siis samuti leiakse keskmine istekoht reas ja luuakse boolean[] massiiv.
+ * Massiiv pikkus on vajalikke istekohtade soovitamise arv ning kõik tema väärtused on false, kuna vabad kohad on
+ * määratud false väärtusega ja istekohad peavad olema üksteise juures. Siis keskmisest istekohast hakatakse kontrollima
+ * kas rea alammassiiv on võrdne meie loodud massiiviga. Kui leitakse, siis programm kohe tagastab istkohtade indeksid.
+ *
+ * Kui saalis ei leidu selliseid istkohti, et nad oleksid koos, siis järjest keskelt valitakse kõik vabad kohad.
+ *
+ *
+ */
 @Component
 public class SeatRecommender {
 
