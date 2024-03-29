@@ -48,7 +48,9 @@ public class SessionService {
     public List<SessionDTO> getAllSessionsWithFilters(
             LocalDateTime datetime, Set<String> genresString, Set<String> ageRestrictionsString)
             throws SessionNotFoundException {
-        if (genresString == null && ageRestrictionsString == null)
+
+        if ((genresString == null || genresString.isEmpty()) &&
+                (ageRestrictionsString == null|| ageRestrictionsString.isEmpty()))
             return getSessionsByDateAndTime(datetime);
 
         Set<Genre> genres;
@@ -57,23 +59,33 @@ public class SessionService {
         if (genresString == null || genresString.isEmpty()) {
             ageRestrictions = ageRestrictionsString
                     .stream()
-                    .map(AgeRestriction::valueOf).collect(Collectors.toSet());
-            return getSessionsByAgeRestrictions(datetime, ageRestrictions);
+                    .map(AgeRestriction::getAgeRestrictionByName)
+                    .collect(Collectors.toSet());
+            return getAllSessionsByAgeRestrictions(datetime, ageRestrictions);
         }
 
         if (ageRestrictionsString == null || ageRestrictionsString.isEmpty()) {
-            genres = genresString.stream().map(Genre::getGenreByEstonianName).collect(Collectors.toSet());
+            genres = genresString.stream()
+                    .map(Genre::getGenreByEstonianName)
+                    .collect(Collectors.toSet());
             return getAllSessionsByGenres(datetime, genres);
         }
 
         return getSessionsByDateAndTime(datetime);
     }
 
-    public List<SessionDTO> getSessionsByAgeRestrictions(LocalDateTime datetime, Set<AgeRestriction> ageRestrictions) {
+    public List<SessionDTO> getAllSessionsByAgeRestrictions(LocalDateTime datetime, Set<AgeRestriction> ageRestrictions) {
         LocalDate date = datetime.toLocalDate();
         LocalTime time = datetime.toLocalTime();
 
-        return sessionRepository.findAllByDateAndTimeAndAgeRestrictionList(date, time, ageRestrictions)
+        if (date.isEqual(LocalDate.now()))
+            return sessionRepository
+                    .findAllSessionsByCurrentDateAndTimeAndAgeRestrictionList(ageRestrictions, date, time)
+                    .stream()
+                    .map(sessionMapperDTO::SessionToDTO)
+                    .collect(Collectors.toList());
+
+        return sessionRepository.findAllByDateAndAgeRestrictionList(ageRestrictions, date)
                 .stream()
                 .map(sessionMapperDTO::SessionToDTO)
                 .collect(Collectors.toList());
@@ -84,16 +96,13 @@ public class SessionService {
 
         LocalDate date = datetime.toLocalDate();
         LocalTime time = datetime.toLocalTime();
-        /*
-        List<Session> sessions = new ArrayList<>();
-        for (Genre genre : genres){
-            System.out.println(genre);
-            sessions.addAll(
-                    sessionRepository.findAllSessionsByGenreAndDate(date, genre)
-            );
-        }
 
-         */
+        if (date.isEqual(LocalDate.now()))
+            return sessionRepository.findAllSessionsByGenresAndCurrentDate(genres, time)
+                    .stream()
+                    .map(sessionMapperDTO::SessionToDTO)
+                    .collect(Collectors.toList());
+
         return sessionRepository.findAllSessionsByGenresAndDate(genres, date)
                 .stream()
                 .map(sessionMapperDTO::SessionToDTO)
@@ -105,13 +114,13 @@ public class SessionService {
         LocalDate date = datetime.toLocalDate();
         LocalTime time = datetime.toLocalTime();
         List<Session> sessions;
-        if (date.isAfter(LocalDate.now()))
-            sessions = sessionRepository.findAllByDateOfSession(date);
+
+        if (!date.isEqual(LocalDate.now()))
+            sessions = sessionRepository.findAllByDate(date);
         else
             sessions = sessionRepository
                 .findAllByDateAndTime(date, time);
-        if (sessions.isEmpty())
-            throw new SessionNotFoundException("No sessions found");
+
         return sessions.stream()
                 .map(sessionMapperDTO::SessionToDTO)
                 .collect(Collectors.toList());

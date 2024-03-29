@@ -21,14 +21,6 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
             "ss.dateOfSession <= :date AND ss.timeOfSession <= :time")
     List<Session> findAllActualSessions(LocalDate date, LocalTime time);
 
-    @Query("SELECT DISTINCT ss FROM Session ss " +
-            "JOIN ss.movie mv " +
-            "JOIN mv.genres genre " +
-            "WHERE genre IN :genres AND " +
-            "ss.dateOfSession = :localDate " +
-            "ORDER BY ss.timeOfSession")
-    List<Session> findAllSessionsByGenresAndDate(
-            @Param("genres") Set<Genre> genres, @Param("localDate") LocalDate localDate);
 
     @Query("SELECT ss FROM Session ss JOIN ss.movie mv WHERE :genre MEMBER OF mv.genres AND " +
             "ss.dateOfSession = :date")
@@ -37,10 +29,11 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
 
     Optional<Session> findById(long id);
 
+
     @Query("SELECT ss FROM Session ss WHERE " +
-            "ss.dateOfSession = :date " +
-            "ORDER BY ss.timeOfSession")
-    List<Session> findAllByDateOfSession(LocalDate date);
+            "ss.dateOfSession = :date " )
+    List<Session> findAllByDate(@Param("date") LocalDate date);
+
 
     @Query("SELECT ss FROM Session ss WHERE " +
             "ss.dateOfSession = :date AND ss.timeOfSession >= :time " +
@@ -48,9 +41,37 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     List<Session> findAllByDateAndTime(
             LocalDate date, LocalTime time);
 
+
+    @Query("SELECT DISTINCT ss FROM Session ss " +
+            "JOIN ss.movie mv " +
+            "JOIN mv.genres genre " +
+            "WHERE genre IN :genres AND " +
+            "ss.dateOfSession = :date " +
+            "ORDER BY ss.timeOfSession")
+    List<Session> findAllSessionsByGenresAndDate(
+            @Param("genres") Set<Genre> genres, @Param("date") LocalDate date);
+
+
+    @Query("SELECT DISTINCT ss FROM Session ss " +
+            "JOIN ss.movie mv " +
+            "JOIN mv.genres genre " +
+            "WHERE genre IN :genres AND " +
+            " ss.timeOfSession >= :time " +
+            "ORDER BY ss.timeOfSession")
+    List<Session> findAllSessionsByGenresAndCurrentDate(
+            @Param("genres") Set<Genre> genres, @Param("time") LocalTime time);
+
+
     @Query("SELECT ss FROM Session ss JOIN ss.movie mv WHERE " +
-            "(ss.dateOfSession = :date AND ss.timeOfSession > :time OR ss.dateOfSession > :date)" +
+            "(ss.dateOfSession = :date)" +
             " AND mv.ageRestriction IN :ageRestrictions")
-    List<Session> findAllByDateAndTimeAndAgeRestrictionList(
-            LocalDate date, LocalTime time, Set<AgeRestriction> ageRestrictions);
+    List<Session> findAllByDateAndAgeRestrictionList(
+            Set<AgeRestriction> ageRestrictions, LocalDate date);
+
+
+    @Query("SELECT ss FROM Session ss JOIN ss.movie mv WHERE " +
+            "mv.ageRestriction IN :ageRestrictions AND ss.dateOfSession = :date AND ss.timeOfSession >= :time " +
+            "ORDER BY ss.timeOfSession")
+    List<Session> findAllSessionsByCurrentDateAndTimeAndAgeRestrictionList(
+            Set<AgeRestriction> ageRestrictions, LocalDate date, LocalTime time);
 }

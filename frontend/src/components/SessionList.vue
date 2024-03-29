@@ -47,6 +47,7 @@ ChatGPT https://chat.openai.com/c/a7a92d90-8b30-48ad-9209-ce7e288d4a57
         >
           Vanuse piirangud
         </button>
+        {{this.chosenRestrictions}}
         <div class="dropdown-menu" :class="{ 'show': isAgeDropdownOpen }" aria-labelledby="ageDropdownButton">
           <div v-for="(restriction, index) in ageRestrictions" :key="index">
             <label>

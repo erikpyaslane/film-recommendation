@@ -18,7 +18,7 @@ public class MovieDTOMapper {
                 movie.getId(),
                 movie.getTitle(),
                 movie.getRating(),
-                movie.getAgeRestriction().name(),
+                movie.getAgeRestriction().getName(),
                 movie.getReleaseYear(),
                 movie.getGenres()
                         .stream()
